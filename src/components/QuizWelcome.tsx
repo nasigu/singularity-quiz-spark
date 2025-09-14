@@ -37,7 +37,11 @@ const QuizWelcome = ({ onStart }: QuizWelcomeProps) => {
       <div className="relative z-10 text-center max-w-4xl mx-auto">
         {/* Logo and company name */}
         <div className={`mb-8 transition-all duration-800 ${currentStep >= 0 ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
-          <div className="infinity-logo text-6xl mb-4">∞</div>
+          <div className="flex items-center justify-center mb-6">
+            <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-primary-start via-primary-middle to-primary-end flex items-center justify-center shadow-lg">
+              <span className="text-3xl font-bold text-white">∞</span>
+            </div>
+          </div>
           <h1 className="text-4xl md:text-6xl font-bold mb-2">
             <span className="bg-gradient-to-r from-primary-start via-primary-middle to-primary-end bg-clip-text text-transparent">Singularity Agency</span>
           </h1>
