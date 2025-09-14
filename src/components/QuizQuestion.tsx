@@ -70,6 +70,46 @@ const QuizQuestion = ({
     return null;
   };
 
+  // Форматирование телефона
+  const formatPhone = (value: string): string => {
+    // Убираем все кроме цифр и +
+    let cleaned = value.replace(/[^\d+]/g, '');
+    
+    // Если пустое поле, возвращаем +7
+    if (!cleaned || cleaned === '+') {
+      return '+7';
+    }
+    
+    // Если не начинается с +, добавляем +
+    if (!cleaned.startsWith('+')) {
+      cleaned = '+' + cleaned;
+    }
+    
+    // Если начинается с +7 (российский номер)
+    if (cleaned.startsWith('+7')) {
+      const digits = cleaned.slice(2);
+      if (digits.length === 0) return '+7';
+      if (digits.length <= 3) return `+7 (${digits}`;
+      if (digits.length <= 6) return `+7 (${digits.slice(0, 3)}) ${digits.slice(3)}`;
+      if (digits.length <= 8) return `+7 (${digits.slice(0, 3)}) ${digits.slice(3, 6)}-${digits.slice(6)}`;
+      return `+7 (${digits.slice(0, 3)}) ${digits.slice(3, 6)}-${digits.slice(6, 8)}-${digits.slice(8, 10)}`;
+    }
+    
+    // Для других стран - простое форматирование
+    const countryMatch = cleaned.match(/^\+(\d+)/);
+    if (countryMatch) {
+      const countryCode = countryMatch[1];
+      const digits = cleaned.slice(countryCode.length + 1);
+      
+      if (digits.length <= 3) return `+${countryCode} ${digits}`;
+      if (digits.length <= 6) return `+${countryCode} ${digits.slice(0, 3)} ${digits.slice(3)}`;
+      if (digits.length <= 10) return `+${countryCode} ${digits.slice(0, 3)} ${digits.slice(3, 6)} ${digits.slice(6)}`;
+      return `+${countryCode} ${digits.slice(0, 3)} ${digits.slice(3, 6)} ${digits.slice(6, 10)}`;
+    }
+    
+    return cleaned;
+  };
+
   // Инициализируем состояние при смене вопроса или начального ответа
   useEffect(() => {
     // Очищаем ошибку валидации при смене вопроса
@@ -190,9 +230,16 @@ const QuizQuestion = ({
   const handleTextChange = (value: string) => {
     // Специальная обработка для поля телефона
     if (question.id === 'contact_phone') {
-      // Не позволяем удалить символ "+"
+      // Если пользователь пытается удалить "+", восстанавливаем "+7"
       if (!value.startsWith('+')) {
-        return; // Игнорируем изменение
+        setTextAnswer('+7');
+        return;
+      }
+      
+      // Если введен только "+", добавляем "7"
+      if (value === '+') {
+        setTextAnswer('+7');
+        return;
       }
       
       // Применяем форматирование
