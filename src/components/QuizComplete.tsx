@@ -1,5 +1,6 @@
 import { Button } from '@/components/ui/button';
 import { CheckCircle2, Download, Calendar, Phone } from 'lucide-react';
+import { quizStore } from '@/quiz/store';
 
 interface QuizCompleteProps {
   onRestart: () => void;
@@ -7,22 +8,16 @@ interface QuizCompleteProps {
 
 const QuizComplete = ({ onRestart }: QuizCompleteProps) => {
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center px-4 relative overflow-hidden">
-      {/* Background effects */}
-      <div className="absolute inset-0 opacity-20">
-        <div className="absolute top-1/3 left-1/3 w-96 h-96 rounded-full bg-gradient-infinity blur-3xl animate-pulse-glow"></div>
-        <div className="absolute bottom-1/3 right-1/3 w-72 h-72 rounded-full bg-gradient-accent blur-3xl animate-pulse-glow delay-1000"></div>
-      </div>
-
-      <div className="relative z-10 text-center max-w-3xl mx-auto">
+    <div className="min-h-screen flex flex-col items-center justify-center px-4 bg-background">
+      <div className="text-center max-w-3xl mx-auto">
         {/* Success icon */}
         <div className="mb-8 animate-fade-up">
           <div className="w-24 h-24 mx-auto mb-6 bg-gradient-infinity rounded-full flex items-center justify-center">
             <CheckCircle2 className="w-12 h-12 text-white" />
           </div>
           
-          <h1 className="text-4xl md:text-5xl font-bold mb-4">
-            <span className="text-gradient">Диагностика завершена!</span>
+          <h1 className="text-4xl md:text-5xl font-bold mb-4 text-foreground">
+            Диагностика завершена!
           </h1>
           <p className="text-xl text-muted-foreground mb-8">
             Спасибо за ваши ответы. Мы проанализируем информацию и подготовим персональные рекомендации.
@@ -30,12 +25,12 @@ const QuizComplete = ({ onRestart }: QuizCompleteProps) => {
         </div>
 
         {/* Results info */}
-        <div className="bg-card rounded-2xl p-8 shadow-lg quiz-card mb-8 animate-slide-in">
-          <h3 className="text-2xl font-semibold mb-6 text-gradient">Что дальше?</h3>
+        <div className="bg-card rounded-2xl p-8 shadow-lg mb-8 animate-slide-in">
+          <h3 className="text-2xl font-semibold mb-6 text-foreground">Что дальше?</h3>
           
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div className="flex items-start space-x-4">
-              <div className="w-10 h-10 bg-gradient-accent rounded-full flex items-center justify-center flex-shrink-0">
+              <div className="w-10 h-10 bg-primary rounded-full flex items-center justify-center flex-shrink-0">
                 <Download className="w-5 h-5 text-white" />
               </div>
               <div className="text-left">
@@ -47,7 +42,7 @@ const QuizComplete = ({ onRestart }: QuizCompleteProps) => {
             </div>
 
             <div className="flex items-start space-x-4">
-              <div className="w-10 h-10 bg-gradient-infinity rounded-full flex items-center justify-center flex-shrink-0">
+              <div className="w-10 h-10 bg-primary rounded-full flex items-center justify-center flex-shrink-0">
                 <Calendar className="w-5 h-5 text-white" />
               </div>
               <div className="text-left">
@@ -61,7 +56,7 @@ const QuizComplete = ({ onRestart }: QuizCompleteProps) => {
         </div>
 
         {/* Contact info */}
-        <div className="bg-card/50 backdrop-blur-sm rounded-xl p-6 border border-border/50 mb-8 animate-fade-up">
+        <div className="bg-card rounded-xl p-6 border border-border mb-8 animate-fade-up">
           <div className="flex items-center justify-center space-x-4 text-muted-foreground">
             <Phone className="w-4 h-4" />
             <span className="text-sm">Мы свяжемся с вами в ближайшее время</span>
@@ -90,9 +85,9 @@ const QuizComplete = ({ onRestart }: QuizCompleteProps) => {
 
         {/* Company info */}
         <div className="mt-12 animate-fade-up">
-          <div className="infinity-logo text-3xl mb-2">∞</div>
+          <div className="text-3xl mb-2 font-bold text-primary">∞</div>
           <p className="text-muted-foreground text-sm">
-            <span className="text-gradient font-semibold">Singularity Agency</span> — 
+            <span className="font-semibold text-foreground">Singularity Agency</span> — 
             автоматизация бизнес-процессов для роста вашей компании
           </p>
         </div>

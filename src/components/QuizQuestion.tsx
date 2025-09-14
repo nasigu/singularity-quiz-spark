@@ -1,9 +1,9 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
-import { ArrowRight, ArrowLeft, Check } from 'lucide-react';
+import { ArrowRight, ArrowLeft, Check, AlertCircle } from 'lucide-react';
 
 export type QuestionType = 'single' | 'multiple' | 'text' | 'textarea';
 
@@ -24,6 +24,7 @@ interface QuizQuestionProps {
   onNext: (answer: string | string[]) => void;
   onPrev: () => void;
   canGoBack: boolean;
+  initialAnswer?: string | string[];
 }
 
 const QuizQuestion = ({ 
@@ -32,11 +33,80 @@ const QuizQuestion = ({
   totalQuestions, 
   onNext, 
   onPrev, 
-  canGoBack 
+  canGoBack,
+  initialAnswer
 }: QuizQuestionProps) => {
   const [singleAnswer, setSingleAnswer] = useState<string>('');
   const [multipleAnswers, setMultipleAnswers] = useState<string[]>([]);
   const [textAnswer, setTextAnswer] = useState<string>('');
+  const [validationError, setValidationError] = useState<string>('');
+
+  // Функции валидации
+  const validateEmail = (email: string): string | null => {
+    if (!email.trim()) return null; // Пустой email проверится через required
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      return 'Введите корректный email адрес';
+    }
+    return null;
+  };
+
+  const validatePhone = (phone: string): string | null => {
+    if (!phone.trim()) return null; // Пустой телефон может быть optional
+    const phoneRegex = /^(\+7|8)?[\s\-]?\(?\d{3}\)?[\s\-]?\d{3}[\s\-]?\d{2}[\s\-]?\d{2}$/;
+    if (!phoneRegex.test(phone.replace(/\s/g, ''))) {
+      return 'Введите корректный номер телефона';
+    }
+    return null;
+  };
+
+  const validateTextInput = (value: string): string | null => {
+    if (question.id === 'contact_email') {
+      return validateEmail(value);
+    }
+    if (question.id === 'contact_phone') {
+      return validatePhone(value);
+    }
+    return null;
+  };
+
+  // Инициализируем состояние при смене вопроса или начального ответа
+  useEffect(() => {
+    // Очищаем ошибку валидации при смене вопроса
+    setValidationError('');
+    
+    if (initialAnswer) {
+      // Восстанавливаем сохраненный ответ
+      if (question.type === 'single') {
+        setSingleAnswer(initialAnswer as string);
+        setMultipleAnswers([]);
+        setTextAnswer('');
+      } else if (question.type === 'multiple') {
+        setSingleAnswer('');
+        setMultipleAnswers(initialAnswer as string[]);
+        setTextAnswer('');
+      } else if (question.type === 'text' || question.type === 'textarea') {
+        setSingleAnswer('');
+        setMultipleAnswers([]);
+        // Для телефона форматируем сохраненное значение
+        if (question.id === 'contact_phone' && initialAnswer) {
+          setTextAnswer(formatPhone(initialAnswer as string));
+        } else {
+          setTextAnswer(initialAnswer as string);
+        }
+      }
+    } else {
+      // Очищаем все состояния для нового вопроса
+      setSingleAnswer('');
+      setMultipleAnswers([]);
+      // Для поля телефона устанавливаем +7 по умолчанию
+      if (question.id === 'contact_phone') {
+        setTextAnswer('+7');
+      } else {
+        setTextAnswer('');
+      }
+    }
+  }, [question.id, initialAnswer, question.type]);
 
   const progress = ((currentQuestion - 1) / totalQuestions) * 100;
 
@@ -64,7 +134,20 @@ const QuizQuestion = ({
         break;
       case 'text':
       case 'textarea':
-        answer = textAnswer;
+        // Для телефона сохраняем "чистое" значение без форматирования
+        if (question.id === 'contact_phone') {
+          answer = textAnswer.replace(/[^\d+]/g, '');
+        } else {
+          answer = textAnswer;
+        }
+        
+        // Проверяем валидацию для текстовых полей
+        const validationError = validateTextInput(textAnswer);
+        if (validationError) {
+          setValidationError(validationError);
+          return;
+        }
+        setValidationError('');
         break;
       default:
         answer = '';
@@ -78,7 +161,14 @@ const QuizQuestion = ({
   };
 
   const canProceed = () => {
-    if (!question.required) return true;
+    if (!question.required) {
+      // Для необязательных полей проверяем только валидацию если поле заполнено
+      if ((question.type === 'text' || question.type === 'textarea') && textAnswer.trim()) {
+        const validationError = validateTextInput(textAnswer);
+        return !validationError;
+      }
+      return true;
+    }
     
     switch (question.type) {
       case 'single':
@@ -87,9 +177,34 @@ const QuizQuestion = ({
         return multipleAnswers.length > 0;
       case 'text':
       case 'textarea':
-        return textAnswer.trim().length > 0;
+        if (textAnswer.trim().length === 0) return false;
+        // Проверяем валидацию для текстовых полей
+        const validationError = validateTextInput(textAnswer);
+        return !validationError;
       default:
         return true;
+    }
+  };
+
+  // Обработчик изменения текстового поля с валидацией в реальном времени
+  const handleTextChange = (value: string) => {
+    // Специальная обработка для поля телефона
+    if (question.id === 'contact_phone') {
+      // Не позволяем удалить символ "+"
+      if (!value.startsWith('+')) {
+        return; // Игнорируем изменение
+      }
+      
+      // Применяем форматирование
+      const formatted = formatPhone(value);
+      setTextAnswer(formatted);
+    } else {
+      setTextAnswer(value);
+    }
+    
+    // Очищаем ошибку при начале ввода
+    if (validationError) {
+      setValidationError('');
     }
   };
 
@@ -172,10 +287,16 @@ const QuizQuestion = ({
               <div>
                 <Input
                   value={textAnswer}
-                  onChange={(e) => setTextAnswer(e.target.value)}
+                  onChange={(e) => handleTextChange(e.target.value)}
                   placeholder={question.placeholder || 'Введите ваш ответ...'}
-                  className="quiz-input text-base p-4 h-14"
+                  className={`quiz-input text-base p-4 h-14 ${validationError ? 'border-red-500' : ''}`}
                 />
+                {validationError && (
+                  <div className="flex items-center mt-2 text-red-500 text-sm">
+                    <AlertCircle className="w-4 h-4 mr-1" />
+                    <span>{validationError}</span>
+                  </div>
+                )}
               </div>
             )}
 
@@ -183,11 +304,17 @@ const QuizQuestion = ({
               <div>
                 <Textarea
                   value={textAnswer}
-                  onChange={(e) => setTextAnswer(e.target.value)}
+                  onChange={(e) => handleTextChange(e.target.value)}
                   placeholder={question.placeholder || 'Введите ваш ответ...'}
-                  className="quiz-input text-base p-4 min-h-32 resize-none"
+                  className={`quiz-input text-base p-4 min-h-32 resize-none ${validationError ? 'border-red-500' : ''}`}
                   rows={4}
                 />
+                {validationError && (
+                  <div className="flex items-center mt-2 text-red-500 text-sm">
+                    <AlertCircle className="w-4 h-4 mr-1" />
+                    <span>{validationError}</span>
+                  </div>
+                )}
               </div>
             )}
           </div>
