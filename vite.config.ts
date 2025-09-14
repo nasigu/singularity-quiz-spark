@@ -15,4 +15,6 @@ export default defineConfig(({ mode }) => ({
       "@": path.resolve(__dirname, "./src"),
     },
   },
+  // Настройка для GitHub Pages
+  base: process.env.NODE_ENV === 'production' ? '/singularity-quiz-spark/' : '/',
 }));
