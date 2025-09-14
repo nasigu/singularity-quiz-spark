@@ -57,7 +57,10 @@ const Index = () => {
   const [currentQuestion, setCurrentQuestion] = useState(0);
   const [answers, setAnswers] = useState<Record<string, string | string[]>>({});
 
+  console.log('Index component rendered, currentStep:', currentStep);
+
   const handleStart = () => {
+    console.log('handleStart called');
     setCurrentStep('questions');
     setCurrentQuestion(0);
   };
