@@ -1,0 +1,23 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+# Roadmap Compliance Rules
+
+- You should always strive to follow the plan from [tasks.md](mdc:docs/tasks.md).
+- Before starting to think about your answer, understand which step you need to complete next.
+- If the user's request contradicts the plan, fulfill the request anyway.
+- If the user's request is not related to the current project, fulfill the request.
+- At the end of each task edit [tasks.md](mdc:docs/tasks.md) to check off the completed steps.
+- If the user disrupts the order of steps, still edit [tasks.md](mdc:docs/tasks.md) to check off the completed steps.
+- At the end of each response, write to the user which steps have been completed, in the format "[X] Step name". Use wording from [tasks.md](mdc:docs/tasks.md).
+- Implement only those items in the [tasks.md](mdc:docs/tasks.md) that you are explicitly asked to do. Example: when creating authorization, you have the right to deviate a bit from the prompt and create functionality that provides security and convenience. But you are not allowed to go ahead of the roadmap and create, for example, user profile settings
+- If you edited [tasks.md](mdc:docs/tasks.md), write in the chat "🔄Roadmap has been updated"
+
+# Deployment Rules
+
+- После любых изменений в коде (правок, исправлений, новых функций) ОБЯЗАТЕЛЬНО делай деплой через `npm run deploy`
+- Всегда коммить изменения с понятным сообщением перед деплоем
+- После деплоя сообщай пользователю ссылку на обновленный сайт: https://nasigu.github.io/singularity-quiz-spark/
+- Если изменения влияют на UI/UX, упоминай что нужно подождать 2-3 минуты для обновления GitHub Pages

@@ -86,12 +86,12 @@ const QuizComplete = ({ onRestart }: QuizCompleteProps) => {
         </div>
 
         {/* Action buttons */}
-        <div className="flex flex-col sm:flex-row gap-4 justify-center animate-fade-up">
+        <div className="flex flex-col sm:flex-row gap-6 justify-center animate-fade-up">
           <Button 
             onClick={onRestart}
             variant="outline"
             size="lg"
-            className="px-6"
+            className="px-8 py-4 text-lg"
           >
             Пройти еще раз
           </Button>
@@ -100,14 +100,14 @@ const QuizComplete = ({ onRestart }: QuizCompleteProps) => {
             onClick={handleDownloadJSON}
             variant="outline"
             size="lg"
-            className="px-6"
+            className="px-8 py-4 text-lg"
           >
-            <Download className="w-4 h-4 mr-2" />
+            <Download className="w-5 h-5 mr-3" />
             Скачать JSON
           </Button>
           
           <Button 
-            className="btn-infinity px-6"
+            className="btn-infinity px-8 py-4 text-lg"
             size="lg"
             onClick={() => window.open('https://t.me/singularityagency', '_blank')}
           >
