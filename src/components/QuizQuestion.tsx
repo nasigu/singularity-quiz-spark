@@ -256,7 +256,7 @@ const QuizQuestion = ({
   };
 
   return (
-    <div className="min-h-screen flex flex-col">
+    <div className="min-h-screen flex flex-col max-h-[calc(100vh-60px)]">
       {/* Progress bar */}
       <div className="w-full bg-muted h-1">
         <div 
@@ -265,128 +265,126 @@ const QuizQuestion = ({
         />
       </div>
 
-      <div className="flex-1 flex flex-col items-center justify-center px-4 py-8">
-        <div className="w-full max-w-2xl mx-auto">
-          {/* Question header */}
-          <div className="text-center mb-8 animate-fade-up">
-            <div className="text-sm text-muted-foreground mb-2">
-              Вопрос {currentQuestion} из {totalQuestions}
+      <div className="flex-1 flex flex-col items-center justify-center px-4 py-8 overflow-auto w-full max-w-2xl mx-auto">
+        {/* Question header */}
+        <div className="text-center mb-8 animate-fade-up">
+          <div className="text-sm text-muted-foreground mb-2">
+            Вопрос {currentQuestion} из {totalQuestions}
+          </div>
+          <h2 className="text-2xl md:text-3xl font-bold mb-4 text-foreground">
+            {question.title}
+          </h2>
+          {question.description && (
+            <p className="text-muted-foreground text-lg">
+              {question.description}
+            </p>
+          )}
+        </div>
+
+        {/* Question content */}
+        <div className="bg-card rounded-2xl p-8 shadow-lg quiz-card animate-slide-in w-full">
+          {question.type === 'single' && question.options && (
+            <div className="space-y-3">
+              {question.options.map((option, index) => (
+                <div
+                  key={index}
+                  className={`quiz-option ${singleAnswer === option ? 'selected' : ''}`}
+                  onClick={() => handleSingleSelect(option)}
+                >
+                  <div className="flex items-center space-x-3">
+                    <div className="w-5 h-5 rounded-full border-2 border-border flex items-center justify-center">
+                      {singleAnswer === option && (
+                        <div className="w-3 h-3 rounded-full bg-infinity"></div>
+                      )}
+                    </div>
+                    <Label className="flex-1 cursor-pointer text-base">
+                      {option}
+                    </Label>
+                  </div>
+                </div>
+              ))}
             </div>
-            <h2 className="text-2xl md:text-3xl font-bold mb-4 text-foreground">
-              {question.title}
-            </h2>
-            {question.description && (
-              <p className="text-muted-foreground text-lg">
-                {question.description}
-              </p>
-            )}
-          </div>
+          )}
 
-          {/* Question content */}
-          <div className="bg-card rounded-2xl p-8 shadow-lg quiz-card animate-slide-in">
-            {question.type === 'single' && question.options && (
-              <div className="space-y-3">
-                {question.options.map((option, index) => (
-                  <div
-                    key={index}
-                    className={`quiz-option ${singleAnswer === option ? 'selected' : ''}`}
-                    onClick={() => handleSingleSelect(option)}
-                  >
-                    <div className="flex items-center space-x-3">
-                      <div className="w-5 h-5 rounded-full border-2 border-border flex items-center justify-center">
-                        {singleAnswer === option && (
-                          <div className="w-3 h-3 rounded-full bg-infinity"></div>
-                        )}
-                      </div>
-                      <Label className="flex-1 cursor-pointer text-base">
-                        {option}
-                      </Label>
+          {question.type === 'multiple' && question.options && (
+            <div className="space-y-3">
+              {question.options.map((option, index) => (
+                <div
+                  key={index}
+                  className={`quiz-option ${multipleAnswers.includes(option) ? 'selected' : ''}`}
+                  onClick={() => handleMultipleSelect(option)}
+                >
+                  <div className="flex items-center space-x-3">
+                    <div className="w-5 h-5 rounded border-2 border-border flex items-center justify-center">
+                      {multipleAnswers.includes(option) && (
+                        <Check className="w-3 h-3 text-primary" />
+                      )}
                     </div>
+                    <Label className="flex-1 cursor-pointer text-base">
+                      {option}
+                    </Label>
                   </div>
-                ))}
-              </div>
-            )}
+                </div>
+              ))}
+            </div>
+          )}
 
-            {question.type === 'multiple' && question.options && (
-              <div className="space-y-3">
-                {question.options.map((option, index) => (
-                  <div
-                    key={index}
-                    className={`quiz-option ${multipleAnswers.includes(option) ? 'selected' : ''}`}
-                    onClick={() => handleMultipleSelect(option)}
-                  >
-                    <div className="flex items-center space-x-3">
-                      <div className="w-5 h-5 rounded border-2 border-border flex items-center justify-center">
-                        {multipleAnswers.includes(option) && (
-                          <Check className="w-3 h-3 text-primary" />
-                        )}
-                      </div>
-                      <Label className="flex-1 cursor-pointer text-base">
-                        {option}
-                      </Label>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            )}
+          {question.type === 'text' && (
+            <div>
+              <Input
+                value={textAnswer}
+                onChange={(e) => handleTextChange(e.target.value)}
+                placeholder={question.placeholder || 'Введите ваш ответ...'}
+                className={`quiz-input text-base p-4 h-14 ${validationError ? 'border-red-500' : ''}`}
+              />
+              {validationError && (
+                <div className="flex items-center mt-2 text-red-500 text-sm">
+                  <AlertCircle className="w-4 h-4 mr-1" />
+                  <span>{validationError}</span>
+                </div>
+              )}
+            </div>
+          )}
 
-            {question.type === 'text' && (
-              <div>
-                <Input
-                  value={textAnswer}
-                  onChange={(e) => handleTextChange(e.target.value)}
-                  placeholder={question.placeholder || 'Введите ваш ответ...'}
-                  className={`quiz-input text-base p-4 h-14 ${validationError ? 'border-red-500' : ''}`}
-                />
-                {validationError && (
-                  <div className="flex items-center mt-2 text-red-500 text-sm">
-                    <AlertCircle className="w-4 h-4 mr-1" />
-                    <span>{validationError}</span>
-                  </div>
-                )}
-              </div>
-            )}
+          {question.type === 'textarea' && (
+            <div>
+              <Textarea
+                value={textAnswer}
+                onChange={(e) => handleTextChange(e.target.value)}
+                placeholder={question.placeholder || 'Введите ваш ответ...'}
+                className={`quiz-input text-base p-4 min-h-32 resize-none ${validationError ? 'border-red-500' : ''}`}
+                rows={4}
+              />
+              {validationError && (
+                <div className="flex items-center mt-2 text-red-500 text-sm">
+                  <AlertCircle className="w-4 h-4 mr-1" />
+                  <span>{validationError}</span>
+                </div>
+              )}
+            </div>
+          )}
+        </div>
 
-            {question.type === 'textarea' && (
-              <div>
-                <Textarea
-                  value={textAnswer}
-                  onChange={(e) => handleTextChange(e.target.value)}
-                  placeholder={question.placeholder || 'Введите ваш ответ...'}
-                  className={`quiz-input text-base p-4 min-h-32 resize-none ${validationError ? 'border-red-500' : ''}`}
-                  rows={4}
-                />
-                {validationError && (
-                  <div className="flex items-center mt-2 text-red-500 text-sm">
-                    <AlertCircle className="w-4 h-4 mr-1" />
-                    <span>{validationError}</span>
-                  </div>
-                )}
-              </div>
-            )}
-          </div>
+        {/* Navigation */}
+        <div className="flex justify-between items-center mt-8">
+          <Button
+            variant="outline"
+            onClick={onPrev}
+            disabled={!canGoBack}
+            className="flex items-center space-x-2"
+          >
+            <ArrowLeft className="w-4 h-4" />
+            <span>Назад</span>
+          </Button>
 
-          {/* Navigation */}
-          <div className="flex justify-between items-center mt-8">
-            <Button
-              variant="outline"
-              onClick={onPrev}
-              disabled={!canGoBack}
-              className="flex items-center space-x-2"
-            >
-              <ArrowLeft className="w-4 h-4" />
-              <span>Назад</span>
-            </Button>
-
-            <Button
-              onClick={handleNext}
-              disabled={!canProceed()}
-              className="btn-infinity flex items-center space-x-2"
-            >
-              <span>{currentQuestion === totalQuestions ? 'Завершить' : 'Далее'}</span>
-              <ArrowRight className="w-4 h-4" />
-            </Button>
-          </div>
+          <Button
+            onClick={handleNext}
+            disabled={!canProceed()}
+            className="btn-infinity flex items-center space-x-2"
+          >
+            <span>{currentQuestion === totalQuestions ? 'Завершить' : 'Далее'}</span>
+            <ArrowRight className="w-4 h-4" />
+          </Button>
         </div>
       </div>
     </div>
