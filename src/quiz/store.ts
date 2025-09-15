@@ -5,6 +5,15 @@ export interface QuizAnswer {
   timestamp: Date;
 }
 
+export interface TelegramUserInfo {
+  id: number;
+  first_name: string;
+  last_name?: string;
+  username?: string;
+  language_code?: string;
+  user_link?: string;
+}
+
 export interface QuizResult {
   answers: QuizAnswer[];
   startTime: Date;
@@ -12,6 +21,7 @@ export interface QuizResult {
   currentSection: string;
   currentQuestionIndex: number;
   completed: boolean;
+  telegramUser?: TelegramUserInfo;
 }
 
 class QuizStore {
@@ -74,6 +84,12 @@ class QuizStore {
   updatePosition(sectionId: string, questionIndex: number): void {
     this.result.currentSection = sectionId;
     this.result.currentQuestionIndex = questionIndex;
+    this.saveToLocalStorage();
+  }
+
+  // Установить данные пользователя Telegram
+  setTelegramUser(userInfo: TelegramUserInfo): void {
+    this.result.telegramUser = userInfo;
     this.saveToLocalStorage();
   }
 

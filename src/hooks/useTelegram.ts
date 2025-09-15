@@ -108,10 +108,20 @@ export interface TelegramUser {
   language_code?: string;
 }
 
+export interface TelegramUserInfo {
+  id: number;
+  first_name: string;
+  last_name?: string;
+  username?: string;
+  language_code?: string;
+  user_link?: string; // @username или ссылка на профиль
+}
+
 export interface UseTelegramReturn {
   isTelegram: boolean;
   webApp: TelegramWebApp | null;
   user: TelegramUser | null;
+  userInfo: TelegramUserInfo | null;
   initData: string;
   isReady: boolean;
 }
@@ -120,6 +130,7 @@ export const useTelegram = (): UseTelegramReturn => {
   const [isTelegram, setIsTelegram] = useState(false);
   const [webApp, setWebApp] = useState<TelegramWebApp | null>(null);
   const [user, setUser] = useState<TelegramUser | null>(null);
+  const [userInfo, setUserInfo] = useState<TelegramUserInfo | null>(null);
   const [initData, setInitData] = useState('');
   const [isReady, setIsReady] = useState(false);
 
@@ -135,7 +146,18 @@ export const useTelegram = (): UseTelegramReturn => {
         
         // Получаем данные пользователя
         if (tg.initDataUnsafe.user) {
-          setUser(tg.initDataUnsafe.user);
+          const userData = tg.initDataUnsafe.user;
+          setUser(userData);
+          
+          // Формируем userInfo с user_link
+          const userLink = userData.username 
+            ? `@${userData.username}` 
+            : `tg://user?id=${userData.id}`;
+          
+          setUserInfo({
+            ...userData,
+            user_link: userLink
+          });
         }
         
         // Инициализируем WebApp
@@ -164,6 +186,7 @@ export const useTelegram = (): UseTelegramReturn => {
     isTelegram,
     webApp,
     user,
+    userInfo,
     initData,
     isReady
   };

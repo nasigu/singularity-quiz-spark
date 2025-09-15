@@ -7,6 +7,28 @@ interface QuizCompleteProps {
 }
 
 const QuizComplete = ({ onRestart }: QuizCompleteProps) => {
+  const handleDownloadJSON = () => {
+    const result = quizStore.exportResult();
+    const dataStr = JSON.stringify(result, null, 2);
+    const dataBlob = new Blob([dataStr], { type: 'application/json' });
+    
+    const url = URL.createObjectURL(dataBlob);
+    const link = document.createElement('a');
+    link.href = url;
+    
+    // Формируем имя файла с датой и временем
+    const now = new Date();
+    const dateStr = now.toISOString().slice(0, 19).replace(/:/g, '-');
+    const userInfo = result.telegramUser;
+    const userStr = userInfo ? `_${userInfo.username || userInfo.id}` : '';
+    
+    link.download = `quiz_result_${dateStr}${userStr}.json`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+  };
+
   return (
     <div className="min-h-screen flex flex-col items-center justify-center px-4 bg-background">
       <div className="text-center max-w-3xl mx-auto">
@@ -72,6 +94,16 @@ const QuizComplete = ({ onRestart }: QuizCompleteProps) => {
             className="px-6"
           >
             Пройти еще раз
+          </Button>
+          
+          <Button 
+            onClick={handleDownloadJSON}
+            variant="outline"
+            size="lg"
+            className="px-6"
+          >
+            <Download className="w-4 h-4 mr-2" />
+            Скачать JSON
           </Button>
           
           <Button 
